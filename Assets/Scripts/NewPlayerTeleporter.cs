@@ -1,9 +1,14 @@
+// NewPlayerTeleporter.cs
 using UnityEngine;
 using DoorScript;  // damit wir auf Door.ResetDoor() zugreifen können
 
 public class NewPlayerTeleporter : MonoBehaviour
 {
-    [Tooltip("Transform, an den der Player teleportiert wird (Start-Punkt)")]
+    public enum TeleportMode { Advance, Retreat }
+    [Tooltip("Advance: Vorwärts teleportieren; Retreat: Rückwärts teleportieren und jeweils den passenden Check ausführen.")]
+    public TeleportMode mode;
+
+    [Tooltip("Transform, an den der Player teleportiert wird")]
     public Transform TeleportZoneObject;
 
     private void OnTriggerEnter(Collider other)
@@ -11,36 +16,48 @@ public class NewPlayerTeleporter : MonoBehaviour
         if (!other.CompareTag("Player"))
             return;
 
-        // berechne Offset relativ zum Teleporter
+        // 1) Offset & Rotation berechnen
         Vector3 localOffset = transform.InverseTransformPoint(other.transform.position);
-        Quaternion relativeRotation = TeleportZoneObject.rotation * Quaternion.Inverse(transform.rotation);
+        Quaternion relativeRot = TeleportZoneObject.rotation * Quaternion.Inverse(transform.rotation);
 
-        // hol den CharacterController des Players
-        CharacterController cc = other.GetComponent<CharacterController>();
-        if (cc == null)
-            return;
-
-        // ausschalten, teleportieren, Türen zurücksetzen, wieder einschalten
+        // 2) CharacterController temporär deaktivieren
+        var cc = other.GetComponent<CharacterController>();
+        if (cc == null) return;
         cc.enabled = false;
 
+        // 3) Teleportieren
         other.transform.position = TeleportZoneObject.TransformPoint(localOffset);
-        other.transform.rotation = relativeRotation * other.transform.rotation;
+        other.transform.rotation = relativeRot * other.transform.rotation;
 
+        // 4) Türen zurücksetzen
         ResetAllDoors();
 
+        // 5) Controller reaktivieren
         cc.enabled = true;
+
+        // 6) Je nach Mode den passenden Check auslösen
+        switch (mode)
+        {
+            case TeleportMode.Advance:
+                var adv = Object.FindFirstObjectByType<AdvanceCheck>();
+                if (adv != null) adv.ExecuteCheck();
+                else Debug.LogWarning("NewPlayerTeleporter: Kein AdvanceCheck gefunden!");
+                break;
+
+            case TeleportMode.Retreat:
+                var ret = Object.FindFirstObjectByType<RetreatCheck>();
+                if (ret != null) ret.ExecuteCheck();
+                else Debug.LogWarning("NewPlayerTeleporter: Kein RetreatCheck gefunden!");
+                break;
+        }
     }
 
-    /// <summary>
-    /// Schließt alle Türen in der Szene unmittelbar.
-    /// </summary>
     private void ResetAllDoors()
     {
-        // FindObjectsOfType sortiert die Ergebnisse nicht zwingend,
-        // aber für unsere Zwecke reicht es.
-        foreach (var door in FindObjectsOfType<DoorScript.Door>())
-        {
+        // Richtiges Aufrufen von FindObjectsByType:
+        // nur das SortMode-Argument ist nötig, um wie vorher alle aktiven Türen zu holen.
+        var allDoors = Object.FindObjectsByType<Door>(FindObjectsSortMode.None);
+        foreach (var door in allDoors)
             door.ResetDoor();
-        }
     }
 }
