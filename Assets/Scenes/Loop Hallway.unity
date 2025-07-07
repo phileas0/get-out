@@ -3367,6 +3367,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1119145185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &103220390 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7826889984973843266, guid: 9c7ddbd4e1e420e499a374e4556b2c71, type: 3}
+  m_PrefabInstance: {fileID: 299936261}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &107442286
 GameObject:
   m_ObjectHideFlags: 0
@@ -12225,6 +12230,10 @@ MonoBehaviour:
   anomalies:
   - prefab: {fileID: 3989964161746017752, guid: b7bd3dbe97dbc4a4e8dc096038682fb6, type: 3}
     spawnPoint: {fileID: 762733257}
+  removalEntries:
+  - objectsToRemove:
+    - {fileID: 103220390}
+    - {fileID: 579497398}
 --- !u!4 &410747586
 Transform:
   m_ObjectHideFlags: 0
@@ -18310,6 +18319,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &579497398 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7826889984973843266, guid: 9c7ddbd4e1e420e499a374e4556b2c71, type: 3}
+  m_PrefabInstance: {fileID: 50953474}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &580979787
 GameObject:
   m_ObjectHideFlags: 0
