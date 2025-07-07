@@ -27,7 +27,7 @@ public class AnomalyLogic : MonoBehaviour
     public void anomalyPutNew()
     {
         // 50/50 Chance, überhaupt eine Anomalie zu setzen
-        if (Random.value < 1.0f && anomalies != null && anomalies.Length > 0)
+        if (Random.value < 0.5f && anomalies != null && anomalies.Length > 0)
         {
             anomalyContainer = new GameObject("Anomalies");
 
@@ -37,16 +37,26 @@ public class AnomalyLogic : MonoBehaviour
 
             if (entry.prefab != null && entry.spawnPoint != null)
             {
-                // Instanziere exakt an dem Transform, das zum Prefab in der Liste gehört
+                // 1) Erster Spawn
+                Vector3 pos1 = entry.spawnPoint.position;
                 Instantiate(
-                    entry.prefab, 
-                    entry.spawnPoint.position, 
-                    entry.spawnPoint.rotation, 
+                    entry.prefab,
+                    pos1,
+                    entry.spawnPoint.rotation,
+                    anomalyContainer.transform
+                );
+
+                // 2) Zweiter, gespiegelter Spawn um −25 auf Z
+                Vector3 pos2 = new Vector3(pos1.x, pos1.y, pos1.z - 25f);
+                Instantiate(
+                    entry.prefab,
+                    pos2,
+                    entry.spawnPoint.rotation,
                     anomalyContainer.transform
                 );
 
                 hasAnomalies = true;
-                Debug.Log($"Anomalie #{idx} erstellt an {entry.spawnPoint.position}");
+                Debug.Log($"Anomalie #{idx} erstellt an {pos1} und gespiegelt an {pos2}");
             }
             else
             {
