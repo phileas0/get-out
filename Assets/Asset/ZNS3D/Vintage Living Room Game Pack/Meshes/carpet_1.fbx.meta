@@ -1,9 +1,21 @@
 fileFormatVersion: 2
 guid: 098c0ef3b2013ca44a4c45d2ab223a00
+AssetOrigin:
+  serializedVersion: 1
+  productId: 314464
+  packageName: VINTAGE LIVING ROOM 3D GAME PACK
+  packageVersion: 1.0
+  assetPath: Assets/Scenes/ZNS3D/Vintage Living Room Game Pack/Meshes/carpet_1.fbx
+  uploadId: 741990
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mat_Decors_1.005
+    second: {fileID: 2100000, guid: dd73ec6585adb8148a72f27a2f8dbc3d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -16,8 +28,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -107,10 +117,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 314464
-  packageName: VINTAGE LIVING ROOM 3D GAME PACK
-  packageVersion: 1.0
-  assetPath: Assets/Scenes/ZNS3D/Vintage Living Room Game Pack/Meshes/carpet_1.fbx
-  uploadId: 741990
