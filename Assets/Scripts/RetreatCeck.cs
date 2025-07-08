@@ -5,25 +5,32 @@ public class RetreatCheck : MonoBehaviour
 {
     public void ExecuteCheck()
     {
-        Debug.Log("[Check] ExecuteCheck aufgerufen – hasAnomalies = " + AnomalyLogic.hasAnomalies);
+        Debug.Log("[Retreat] hasAnomalies = " + AnomalyLogic.hasAnomalies);
+        var logic = Object.FindFirstObjectByType<AnomalyLogic>();
 
         if (AnomalyLogic.hasAnomalies)
         {
-            var anomalyLogic = Object.FindFirstObjectByType<AnomalyLogic>();
-            if (anomalyLogic != null)
+            // richtig entschieden → Punktestand erhöhen
+            AnomalyLogic.points++;
+            Debug.Log($"RetreatCheck: correct → points = {AnomalyLogic.points}");
+
+            if (logic != null)
             {
-                anomalyLogic.anomalyDelete();
-                anomalyLogic.anomalyPutNew();
-            }
-            else
-            {
-                Debug.LogWarning("RetreatCheck: Kein AnomalyLogic in der Szene gefunden!");
+                logic.anomalyDelete();
+                logic.anomalyPutNew();
             }
         }
         else
         {
-            Debug.Log("[Check] Quitting…");
-            Application.Quit();
+            // falsch entschieden → Punkte-Reset + Anomalie neu/Reset
+            AnomalyLogic.points = 0;
+            Debug.Log("[Retreat] wrong → reset points to 0");
+
+            if (logic != null)
+            {
+                logic.anomalyDelete();
+                logic.anomalyPutNew();
+            }
         }
     }
 }

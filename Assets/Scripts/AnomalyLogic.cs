@@ -4,6 +4,8 @@ using UnityEngine;
 public class AnomalyLogic : MonoBehaviour
 {
     public static bool hasAnomalies = false;
+    public static int points = 0; // zählt die korrekten Entscheidungen in Folge
+
 
     [System.Serializable]
     public struct AnomalyEntry
