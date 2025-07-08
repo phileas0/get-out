@@ -12,6 +12,7 @@ TagManager:
   - Overlay UI
   - Water
   - UI
+  - hidden render layer
   - 
   - 
   - 
@@ -35,8 +36,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - OVROverlayCanvas Rendering
   - fade
   m_SortingLayers:
   - name: Default
