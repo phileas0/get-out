@@ -15,14 +15,36 @@ public class AnomalyLogic : MonoBehaviour
     [System.Serializable]
     public struct RemovalEntry
     {
-        public GameObject[] objectsToRemove; // die konkreten Instanzen in der Szene
+        public GameObject[] objectsToRemove; // Instanzen in der Szene
     }
 
     public AnomalyEntry[] anomalies;        // mögliche neue Anomalien
-    public RemovalEntry[] removalEntries;   // korrespondierende Szenen-Objekte zum Deaktivieren
+    public RemovalEntry[] removalEntries;   // Szenen-Objekte zum Entfernen
 
     private GameObject anomalyContainer;    
     private List<GameObject> removedObjects = new List<GameObject>();
+
+    // Pools, damit jeder Eintrag erst dran kommt, bevor er erneut gewählt wird
+    private static List<int> spawnPool;
+    private static List<int> removalPool;
+
+    private void Awake()
+    {
+        // Pools initialisieren (wenn leer oder null)
+        if (spawnPool == null || spawnPool.Count == 0)
+        {
+            spawnPool = new List<int>();
+            for (int i = 0; i < anomalies.Length; i++)
+                spawnPool.Add(i);
+        }
+
+        if (removalPool == null || removalPool.Count == 0)
+        {
+            removalPool = new List<int>();
+            for (int i = 0; i < removalEntries.Length; i++)
+                removalPool.Add(i);
+        }
+    }
 
     private void Start()
     {
@@ -46,6 +68,30 @@ public class AnomalyLogic : MonoBehaviour
             RemoveExistingAnomaly();
     }
 
+    private int GetNextSpawnIndex()
+    {
+        if (spawnPool.Count == 0)
+            for (int i = 0; i < anomalies.Length; i++)
+                spawnPool.Add(i);
+
+        int r = Random.Range(0, spawnPool.Count);
+        int idx = spawnPool[r];
+        spawnPool.RemoveAt(r);
+        return idx;
+    }
+
+    private int GetNextRemovalIndex()
+    {
+        if (removalPool.Count == 0)
+            for (int i = 0; i < removalEntries.Length; i++)
+                removalPool.Add(i);
+
+        int r = Random.Range(0, removalPool.Count);
+        int idx = removalPool[r];
+        removalPool.RemoveAt(r);
+        return idx;
+    }
+
     private void SpawnNewAnomaly()
     {
         if (anomalies == null || anomalies.Length == 0)
@@ -56,7 +102,7 @@ public class AnomalyLogic : MonoBehaviour
         }
 
         anomalyContainer = new GameObject("Anomalies");
-        int idx = Random.Range(0, anomalies.Length);
+        int idx = GetNextSpawnIndex();
         var entry = anomalies[idx];
 
         if (entry.prefab == null || entry.spawnPoint == null)
@@ -85,18 +131,16 @@ public class AnomalyLogic : MonoBehaviour
             return;
         }
 
-        int idx = Random.Range(0, removalEntries.Length);
+        int idx = GetNextRemovalIndex();
         var removal = removalEntries[idx];
 
         removedObjects.Clear();
         foreach (var go in removal.objectsToRemove)
-        {
             if (go != null && go.activeSelf)
             {
                 go.SetActive(false);
                 removedObjects.Add(go);
             }
-        }
 
         hasAnomalies = removedObjects.Count > 0;
         Debug.Log($"AnomalyLogic: Entfernte Instanzen für Entry #{idx}");
