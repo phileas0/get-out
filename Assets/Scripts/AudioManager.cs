@@ -1,11 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-/// <summary>
-/// AudioManager für ambienten Hintergrundsound und Footsteps in VR.
-/// An einem leeren GameObject als Komponente hinzufügen.
-/// Im Inspector: CameraTransform, AmbientClip, FootstepClip sowie die beiden AudioMixerGroups zuweisen.
-/// </summary>
 public class AudioManager : MonoBehaviour
 {
     [Header("Referenzen")]
@@ -13,43 +8,46 @@ public class AudioManager : MonoBehaviour
     public Transform cameraTransform;
 
     [Header("Ambient Sound")]
-    [Tooltip("Loopender Ambient-Clip")] public AudioClip ambientClip;
-    [Tooltip("AudioMixerGroup für Ambient")] public AudioMixerGroup ambientMixerGroup;
+    [Tooltip("Loopender Ambient-Clip")]
+    public AudioClip ambientClip;
+    [Tooltip("AudioMixerGroup für Ambient")]
+    public AudioMixerGroup ambientMixerGroup;
 
     [Header("Footsteps")]
-    [Tooltip("Loopender Footstep-Clip")] public AudioClip footstepClip;
-    [Tooltip("AudioMixerGroup für Footsteps")] public AudioMixerGroup footstepsMixerGroup;
+    [Tooltip("Loopender Footstep-Clip")]
+    public AudioClip footstepClip;
+    [Tooltip("AudioMixerGroup für Footsteps")]
+    public AudioMixerGroup footstepsMixerGroup;
 
     [Header("Einstellungen")]
-    [Tooltip("Deadzone für linken Stick, ab wann Footsteps starten")] public float moveDeadZone = 0.2f;
-    [Tooltip("Pitch im Walk (normal = 1)")] public float walkPitch = 1f;
-    [Tooltip("Pitch im Sprint (z.B. 2)")] public float sprintPitch = 2f;
+    [Tooltip("Deadzone für linken Stick, ab wann Footsteps starten")]
+    public float moveDeadZone = 0.2f;
+    [Tooltip("Pitch im Walk (normal = 1)")]
+    public float walkPitch = 1f;
+    [Tooltip("Pitch im Sprint (z.B. 1.5)")]
+    public float sprintPitch = 1.5f;
 
     private AudioSource ambientSource;
     private AudioSource footstepSource;
 
     void Awake()
     {
-        // Kamera-Transform automatisch finden, falls nicht gesetzt
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
-        
-        // AudioListener sicherstellen
+
         if (cameraTransform != null && cameraTransform.GetComponent<AudioListener>() == null)
             cameraTransform.gameObject.AddComponent<AudioListener>();
     }
 
     void Start()
     {
-        // Ambient-Source einrichten
         ambientSource = gameObject.AddComponent<AudioSource>();
         ambientSource.clip = ambientClip;
         ambientSource.outputAudioMixerGroup = ambientMixerGroup;
         ambientSource.loop = true;
-        ambientSource.playOnAwake = false;  // Play im Script starten
+        ambientSource.playOnAwake = false;
         ambientSource.spatialBlend = 0f; // 2D
 
-        // Footstep-Source einrichten
         footstepSource = gameObject.AddComponent<AudioSource>();
         footstepSource.clip = footstepClip;
         footstepSource.outputAudioMixerGroup = footstepsMixerGroup;
@@ -57,7 +55,6 @@ public class AudioManager : MonoBehaviour
         footstepSource.playOnAwake = false;
         footstepSource.spatialBlend = 0f; // 2D
 
-        // Starte Ambient-Sound explizit
         if (ambientClip != null)
         {
             ambientSource.Play();
@@ -72,12 +69,9 @@ public class AudioManager : MonoBehaviour
         Vector2 moveInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
         bool isMoving = moveInput.magnitude > moveDeadZone;
 
-        // Sprint per analogem Trigger
-        float leftTrig  = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
-        float rightTrig = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
-        bool isSprinting = leftTrig > 0.1f || rightTrig > 0.1f;
+        // Sprint per Stick-Click
+        bool isSprinting = OVRInput.Get(OVRInput.Button.PrimaryThumbstick);
 
-        // Footsteps abspielen / stoppen und pitchen
         if (isMoving)
         {
             if (!footstepSource.isPlaying)
@@ -89,6 +83,7 @@ public class AudioManager : MonoBehaviour
                 }
                 else Debug.LogWarning("FootstepClip ist nicht im Inspector gesetzt!");
             }
+            // Passe Pitch: 1x beim Gehen, 1.5x beim Sprinten
             footstepSource.pitch = isSprinting ? sprintPitch : walkPitch;
         }
         else if (footstepSource.isPlaying)
@@ -97,7 +92,6 @@ public class AudioManager : MonoBehaviour
             Debug.Log("Footsteps stopped.");
         }
 
-        // Debugging-Ausgabe für Bewegung und Sprint
         Debug.Log($"isMoving: {isMoving}, isSprinting: {isSprinting}");
     }
 }
